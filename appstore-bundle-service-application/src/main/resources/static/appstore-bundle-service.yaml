@@ -1,0 +1,101 @@
+#
+# If not stated otherwise in this file or this component's LICENSE file the
+# following copyright and licenses apply:
+#
+# Copyright 2023 Liberty Global Technology Services BV
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+openapi: 3.0.1
+info:
+  title: AppStore Bundle Service API
+  description: AppStore Bundle Service handles bundle generation process by interacting with Bundle Generator and Bundle Cryptor services.
+  version: 0.0.1
+paths:
+  /applications/{appId}/{appVersion}/{platformName}/{firmwareVersion}/{appBundleName}:
+    get:
+      tags:
+      - Applications
+      parameters:
+      - name: appId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: appVersion
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: platformName
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: firmwareVersion
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: appBundleName
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: x-request-id
+        in: header
+        required: true
+        schema:
+          type: string
+      responses:
+        202:
+          description: Bundle generation request accepted
+        404:
+          description: Application not found in AppStore Metadata Service
+        400:
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+components:
+  schemas:
+    ErrorResponse:
+      title: ErrorResponse
+      required:
+        - error
+      type: object
+      properties:
+        error:
+          required:
+            - details
+            - httpStatusCode
+            - message
+          type: object
+          properties:
+            httpStatusCode:
+              type: integer
+              format: int32
+            message:
+              type: string
+            details:
+              type: string
+            correlationId:
+              type: string

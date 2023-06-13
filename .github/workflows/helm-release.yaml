@@ -1,0 +1,45 @@
+name: Release helm package
+on:
+  workflow_call:
+    inputs:
+      version:
+        description: "Helm package version"
+        default: true
+        type: string
+    secrets:
+      token:
+        required: true
+env:
+  CI_COMMIT_AUTHOR: Dac-Cloud-Bot
+  CI_COMMIT_AUTHOR_EMAIL: dac-cloud@libertyglobal.com
+  CI_COMMIT_MESSAGE: "[CI] Add Helm Chart"
+  HELM_REPOSITORY: https://libertyglobal.github.io/appstore-bundle-service/charts
+jobs:
+  release-helm:
+    permissions:
+      contents: write
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Configure Git
+        run: |
+          git config user.name ${{ env.CI_COMMIT_AUTHOR }}
+          git config user.email ${{ env.CI_COMMIT_AUTHOR_EMAIL }}
+      - name: Install Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: v3.5.0
+      - name: Generate and Publish Helm
+        run: |
+          git pull
+          helm package --version ${{ inputs.version }} --app-version ${{ inputs.version }} helm/appstore-bundle-service -d charts/
+          helm repo index charts/ --url ${{ env.HELM_REPOSITORY }}
+          git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
+          git config --global user.email "{{ env.CI_COMMIT_AUTHOR_EMAIL }}"
+          git add charts/
+          git commit -m "${{ env.CI_COMMIT_MESSAGE }}"
+          git push
+

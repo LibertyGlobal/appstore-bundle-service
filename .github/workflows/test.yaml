@@ -1,0 +1,42 @@
+name: Test the project
+on:
+  workflow_call:
+    inputs:
+      java-version:
+        description: "JDK Version"
+        type: string
+        required: true
+jobs:
+  test:
+    runs-on: ubuntu-22.04
+    services:
+      postgres:
+        image: postgres:12
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      testcontainers:
+        image: testcontainers/ryuk:0.3.0
+        ports:
+          - 46577:46577
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: ${{ inputs.java-version }}
+          distribution: 'temurin'
+          cache: maven
+      - name: Test
+        run:
+          mvn verify -DskipJarUpload=true -Ddb.port=5432 -Ddocker.skip=true
+          mvn verify -Dci-stage=integration-tests -DskipJarUpload=true -Ddb.port=5432 -Ddocker.skip=true

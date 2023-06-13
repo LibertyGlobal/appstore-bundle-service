@@ -1,0 +1,60 @@
+name: Release a new version
+on:
+  workflow_dispatch:
+    inputs:
+      nextRelease:
+        description: "Version to release"
+        type: string
+        required: true
+      nextDevelopmentVersion:
+        description: "Next development version"
+        type: string
+        required: true
+      runTests:
+        description: "Run IT tests"
+        default: true
+        type: boolean
+
+jobs:
+  test:
+    if: inputs.runTests
+    uses: ./.github/workflows/test.yaml
+    with:
+      java-version: '17'
+  set-release-version:
+    permissions: write-all
+    uses: ./.github/workflows/set-version.yaml
+    if: always() &&
+      !contains(needs.test.result, 'failure') &&
+      !contains(needs.test.result, 'cancelled')
+    with:
+      java-version: '17'
+      version: ${{ inputs.nextRelease }}
+      commit_message: "Release ${{ inputs.nextRelease }}"
+      commit: true
+      create_tag: true
+  build:
+    uses: ./.github/workflows/build.yaml
+    needs: set-release-version
+    with:
+      pushDockerImage: true
+      version: ${{ inputs.nextRelease }}
+      java-version: '17'
+    secrets: inherit
+  helm-release:
+    permissions: write-all
+    uses: ./.github/workflows/helm-release.yaml
+    needs: build
+    with:
+      version: ${{ inputs.nextRelease }}
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}
+  set-dev-version:
+    permissions: write-all
+    uses: ./.github/workflows/set-version.yaml
+    needs: helm-release
+    with:
+      version: ${{ inputs.nextDevelopmentVersion }}
+      commit_message: "Prepare for next development iteration ${{ inputs.nextDevelopmentVersion }}"
+      commit: true
+      java-version: '17'
