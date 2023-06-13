@@ -97,8 +97,8 @@
             The MIT License (MIT)
         </license.includedLicenses>
         <license.skipExistingHeaders>true</license.skipExistingHeaders>
-        <repository.user>acme</repository.user>
-        <repository.repository>acme</repository.repository>
+        <docker_registry.username>set_repository_username</docker_registry.username>
+        <docker_registry.domain>set_repository_domain</docker_registry.domain>
         <docker.image>${project.artifactId}</docker.image>
     </properties>
 
@@ -285,7 +285,6 @@
                 <groupId>org.flywaydb</groupId>
                 <artifactId>flyway-core</artifactId>
                 <version>${flywaydb.version}</version>
-                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.postgresql</groupId>

@@ -168,7 +168,6 @@
             <plugin>
                 <groupId>org.flywaydb</groupId>
                 <artifactId>flyway-maven-plugin</artifactId>
-                <version>${flywaydb.version}</version>
                 <executions>
                     <execution>
                         <phase>generate-sources</phase>

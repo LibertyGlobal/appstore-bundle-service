@@ -123,6 +123,30 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <configuration>
+                    <artifactItems>
+                        <artifactItem>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>storage-persistent</artifactId>
+                            <version>${project.version}</version>
+                            <type>jar</type>
+                            <includes>*/**.sql</includes>
+                        </artifactItem>
+                    </artifactItems>
+                    <outputDirectory>${project.build.directory}/classes</outputDirectory>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <executions>
@@ -134,7 +158,6 @@
                     </execution>
                 </executions>
             </plugin>
-
             <plugin>
                 <groupId>io.fabric8</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
@@ -165,14 +188,44 @@
                     <autoPull>always</autoPull>
                     <images>
                         <image>
-                            <name>${repository.repository}/${repository.user}/${docker.image}</name>
+                            <name>${docker_registry.domain}/${docker_registry.username}/${docker.image}</name>
                             <build>
-                                <maintainer>dac-cloud@libertyglobal.com</maintainer>
-                                <dockerFileDir>${project.basedir}</dockerFileDir>
+                                <from>eclipse-temurin:17-jdk-jammy</from>
+                                <ports>
+                                    <port>8080</port>
+                                </ports>
                                 <tags>
                                     <tag>${buildNumber}</tag>
                                     <tag>${project.version}</tag>
                                 </tags>
+                                <env>
+                                    <APP_NAME>${project.artifactId}</APP_NAME>
+                                    <APP_VERSION>${project.version}</APP_VERSION>
+                                    <APP_REVISION>${scmCommit}</APP_REVISION>
+                                    <APP_BRANCH>${scmBranch}</APP_BRANCH>
+                                    <APP_BUILD_TIME>${maven.build.timestamp}</APP_BUILD_TIME>
+                                </env>
+                                <entryPoint>
+                                    <exec>
+                                        <arg>java</arg>
+                                        <arg>-Dspring.profiles.active=prod</arg>
+                                        <arg>-jar</arg>
+                                        <arg>/app/app.jar</arg>
+                                    </exec>
+                                </entryPoint>
+                                <assemblies>
+                                    <assembly>
+                                        <basedir>/app</basedir>
+                                        <inline>
+                                            <files>
+                                                <file>
+                                                    <source>target/appstore-bundle-service-application-${project.version}-exec.jar</source>
+                                                    <destName>app.jar</destName>
+                                                </file>
+                                            </files>
+                                        </inline>
+                                    </assembly>
+                                </assemblies>
                             </build>
                         </image>
                     </images>

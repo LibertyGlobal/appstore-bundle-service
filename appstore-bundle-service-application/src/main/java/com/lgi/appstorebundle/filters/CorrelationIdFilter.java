@@ -33,7 +33,7 @@ import java.util.UUID;
 @Component
 public class CorrelationIdFilter extends OncePerRequestFilter {
 
-    private static final String X_REQUEST_ID_HEADER_NAME = "x-request-id";
+    public static final String X_REQUEST_ID_HEADER_NAME = "x-request-id";
     private static final String CORRELATION_ID = "correlationId";
 
     @Override

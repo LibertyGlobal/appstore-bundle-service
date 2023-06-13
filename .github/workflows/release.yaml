@@ -3,22 +3,30 @@ on:
   workflow_dispatch:
     inputs:
       nextRelease:
-        description: "Release"
-        default: "1.0.0"
+        description: "Version to release"
         type: string
+        required: true
       nextDevelopmentVersion:
         description: "Next development version"
-        default: "1.0.1-SNAPSHOT"
         type: string
+        required: true
+      runTests:
+        description: "Run IT tests"
+        default: true
+        type: boolean
+
 jobs:
   test:
+    if: inputs.runTests
     uses: ./.github/workflows/test.yaml
     with:
       java-version: '17'
   set-release-version:
     permissions: write-all
     uses: ./.github/workflows/set-version.yaml
-    needs: test
+    if: always() &&
+      !contains(needs.test.result, 'failure') &&
+      !contains(needs.test.result, 'cancelled')
     with:
       java-version: '17'
       version: ${{ inputs.nextRelease }}
