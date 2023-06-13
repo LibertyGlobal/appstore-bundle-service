@@ -2,7 +2,7 @@
 # If not stated otherwise in this file or this component's LICENSE file the
 # following copyright and licenses apply:
 #
-# Copyright 2022 Liberty Global Technology Services BV
+# Copyright 2023 Liberty Global Technology Services BV
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ configMap:
   JDBC_DATABASE_NAME: "appstore_bundle_service" # Database name
   JDBC_SCHEMA: "appstore_bundle_service" # Schema in database
   JDBC_PORT: "5432" # JDBC port
-  ENVIRONMENT: "null" # Part of RabbitMQ encryption message
+  ENVIRONMENT: nil # Part of RabbitMQ encryption message
   MAX_WRITE_NODE_POOL_SIZE: '10' # The max pool size for write mode in the database
   MAX_READ_NODE_POOL_SIZE: '10' # The max pool size for read-only mode in the database
   WRITE_NODE_JDBC_HOST: postgres-write # The host for write mode in the database

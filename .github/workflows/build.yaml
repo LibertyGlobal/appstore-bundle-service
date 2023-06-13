@@ -7,7 +7,7 @@ on:
         type: string
         required: true
       version:
-        description: "Version"
+        description: "Version to build"
         type: string
         required: true
       pushDockerImage:
@@ -20,17 +20,16 @@ on:
       REGISTRY_PASSWORD:
         required: true
 env:
-  DOCKER_REPOSITORY: daccloud
   DOCKER_REGISTRY: docker.io
-  DOCKERFILE_CONTEXT: ./appstore-bundle-service-application
-  DOCKERFILE_LOCATION: Dockerfile
   DOCKER_IMAGE_NAME: appstore-bundle-service
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: v${{ inputs.version }}
       - name: Setup JDK
         uses: actions/setup-java@v3
         with:
@@ -39,17 +38,13 @@ jobs:
           cache: maven
       - name: Build
         run:
-          mvn package -DskipTests -DskipJarUpload=true -Drepository.user=${{ env.DOCKER_REPOSITORY }} -Drepository.registry=${{ env.DOCKER_REGISTRY }} -Ddocker.image=${{ env.DOCKER_IMAGE_NAME }}
+          mvn package -DskipTests -DskipJarUpload=true -DscmCommit=${{ github.sha }} -DscmBranch=${{ github.ref_name }} -Ddocker_registry.username=${{ secrets.REGISTRY_USERNAME }} -Ddocker_registry.domain=${{ env.DOCKER_REGISTRY }} -Ddocker.image=${{ env.DOCKER_IMAGE_NAME }}
       - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
           registry: ${{ env.DOCKER_REGISTRY }}
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
-      - name: Build and Push
-        uses: docker/build-push-action@v4
-        with:
-          context: ${{ env.DOCKERFILE_CONTEXT }}
-          file: ${{ env.DOCKERFILE }}
-          push: ${{ inputs.pushDockerImage }}
-          tags: ${{ env.DOCKER_REPOSITORY }}/${{ env.DOCKER_IMAGE_NAME }}:${{ inputs.VERSION }}
+      - name: Push
+        run:
+          docker push --all-tags ${{ env.DOCKER_REGISTRY }}/${{ secrets.REGISTRY_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}

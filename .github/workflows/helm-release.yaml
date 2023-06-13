@@ -12,13 +12,13 @@ on:
 env:
   CI_COMMIT_AUTHOR: Dac-Cloud-Bot
   CI_COMMIT_AUTHOR_EMAIL: dac-cloud@libertyglobal.com
-  CI_COMMIT_MESSAGE: "[CI] Deploying Helm Charts"
-  HELM_REPOSITORY: https://libertyglobal.github.io/appstore-bundle-service/charts # Change-me
+  CI_COMMIT_MESSAGE: "[CI] Add Helm Chart"
+  HELM_REPOSITORY: https://libertyglobal.github.io/appstore-bundle-service/charts
 jobs:
   release-helm:
     permissions:
       contents: write
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout
         uses: actions/checkout@v3

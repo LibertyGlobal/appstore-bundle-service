@@ -7,7 +7,7 @@
     <parent>
         <groupId>com.lgi.appstorebundle</groupId>
         <artifactId>appstore-bundle-service-storage</artifactId>
-        <version>0.13.0-SNAPSHOT</version>
+        <version>0.15.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>storage-persistent</artifactId>
@@ -168,7 +168,6 @@
             <plugin>
                 <groupId>org.flywaydb</groupId>
                 <artifactId>flyway-maven-plugin</artifactId>
-                <version>${flywaydb.version}</version>
                 <executions>
                     <execution>
                         <phase>generate-sources</phase>

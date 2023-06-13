@@ -8,10 +8,10 @@ on:
         required: true
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     services:
       postgres:
-        image: postgres
+        image: postgres:12
         env:
           POSTGRES_PASSWORD: postgres
         options: >-
@@ -36,6 +36,7 @@ jobs:
           java-version: ${{ inputs.java-version }}
           distribution: 'temurin'
           cache: maven
-      - name: Build
+      - name: Test
         run:
-          mvn verify -DskipTests -DskipJarUpload=true -Ddb.port=5432 -Ddocker.skip=true
+          mvn verify -DskipJarUpload=true -Ddb.port=5432 -Ddocker.skip=true
+          mvn verify -Dci-stage=integration-tests -DskipJarUpload=true -Ddb.port=5432 -Ddocker.skip=true
