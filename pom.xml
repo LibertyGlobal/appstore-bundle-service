@@ -1,0 +1,427 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.6.6</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>com.lgi.appstorebundle</groupId>
+    <artifactId>appstore-bundle-service</artifactId>
+    <version>0.13.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>AppStore Bundle Service</name>
+
+    <modules>
+        <module>appstore-bundle-service-api</module>
+        <module>appstore-bundle-service-application</module>
+        <module>appstore-bundle-service-test</module>
+        <module>appstore-bundle-service-storage</module>
+        <module>appstore-bundle-service-external</module>
+    </modules>
+
+    <properties>
+        <java.version>11</java.version>
+        <basePackage>com.lgi.appstorebundle</basePackage>
+        <postgresql.version>42.3.5</postgresql.version>
+        <flywaydb.version>8.5.10</flywaydb.version>
+        <jooq.version>3.16.6</jooq.version>
+        <testcontainers.version>1.18.0</testcontainers.version>
+        <protonpack.version>1.16</protonpack.version>
+        <opencsv.version>5.1</opencsv.version>
+        <swaggervalidator.version>2.2.2</swaggervalidator.version>
+        <slf4j.version>1.7.30</slf4j.version>
+        <skipITs>true</skipITs>
+        <auto.value.version>1.10.1</auto.value.version>
+        <jackson.core.version>2.14.2</jackson.core.version>
+        <jackson.datatype.version>2.14.2</jackson.datatype.version>
+        <jakarta.annotation-api.version>1.3.5</jakarta.annotation-api.version>
+        <junit-vintage-engine.version>5.9.2</junit-vintage-engine.version>
+        <junit-jupiter-api.version>5.9.2</junit-jupiter-api.version>
+        <junit-jupiter-params>5.9.2</junit-jupiter-params>
+        <joda-time.version>2.12.2</joda-time.version>
+        <awaitility.version>4.2.0</awaitility.version>
+        <auto-service.version>1.0.1</auto-service.version>
+        <swagger-annotations.version>2.2.8</swagger-annotations.version>
+        <spring-boot.version>2.6.6</spring-boot.version>
+        <google.guava.version>31.1-jre</google.guava.version>
+        <r4j.prometeus.version>1.7.1</r4j.prometeus.version>
+        <prometeus.simpleclient.version>0.16.0</prometeus.simpleclient.version>
+        <springdoc-openapi-ui-version>1.4.3</springdoc-openapi-ui-version>
+        <jakarta.validation.version>2.0.2</jakarta.validation.version>
+        <resilience4j.version>1.6.1</resilience4j.version>
+        <assertj.version>3.24.2</assertj.version>
+        <swagger-annotations-version>1.5.22</swagger-annotations-version>
+        <guava.version>31.1-jre</guava.version>
+        <license.failOnMissing>true</license.failOnMissing>
+        <license.failOnBlacklist>true</license.failOnBlacklist>
+        <license.thirdPartyFilename>LICENSE-THIRD-PARTY.txt</license.thirdPartyFilename>
+        <license.includedLicenses>Apache2|${line.separator}
+            Apache 2|${line.separator}
+            Apache 2.0|${line.separator}
+            Apache-2.0|${line.separator}
+            Apache License 2.0|${line.separator}
+            Apache License v2.0|${line.separator}
+            Apache License, version 2.0|${line.separator}
+            Apache License, Version 2.0|${line.separator}
+            Apache Software License - Version 2.0|${line.separator}
+            ASL 2.0|${line.separator}
+            The Apache License, Version 2.0|${line.separator}
+            The Apache Software License, Version 2.0|${line.separator}
+            BSD|${line.separator}
+            BSD License 3|${line.separator}
+            BSD-2-Clause|${line.separator}
+            The BSD 3-Clause License|${line.separator}
+            BSD-3-Clause|${line.separator}
+            The BSD License|${line.separator}
+            CC0|${line.separator}
+            CC0 1.0 Universal License|${line.separator}
+            Public Domain, per Creative Commons CC0|${line.separator}
+            COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0|${line.separator}
+            CDDL/GPLv2+CE|${line.separator}
+            Eclipse Public License 1.0|${line.separator}
+            Eclipse Public License - v 1.0|${line.separator}
+            Eclipse Public License, Version 1.0|${line.separator}
+            Eclipse Public License v2.0|${line.separator}
+            EDL 1.0|${line.separator}
+            Eclipse Distribution License - v 1.0|${line.separator}
+            GPL2 w/ CPE|${line.separator}
+            MIT|${line.separator}
+            MIT License|${line.separator}
+            The MIT License|${line.separator}
+            The MIT License (MIT)
+        </license.includedLicenses>
+        <license.skipExistingHeaders>true</license.skipExistingHeaders>
+        <repository.user>acme</repository.user>
+        <repository.repository>acme</repository.repository>
+        <docker.image>${project.artifactId}</docker.image>
+    </properties>
+
+
+    <profiles>
+        <profile>
+            <id>integration-tests</id>
+            <activation>
+                <property>
+                    <name>ci-stage</name>
+                    <value>integration-tests</value>
+                </property>
+            </activation>
+            <properties>
+                <skipITs>false</skipITs>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration combine.self="override">
+                            <skip>true</skip>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>development</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <spring.profiles.active>dev</spring.profiles.active>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.mycila</groupId>
+                        <artifactId>license-maven-plugin</artifactId>
+                        <version>4.0.rc2</version>
+                        <executions>
+                            <execution>
+                                <id>add-license-headers</id>
+                                <goals>
+                                    <goal>format</goal>
+                                </goals>
+                                <phase>process-sources</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>prod</id>
+            <properties>
+                <spring.profiles.active>prod</spring.profiles.active>
+            </properties>
+        </profile>
+    </profiles>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.auto.value</groupId>
+                <artifactId>auto-value-annotations</artifactId>
+                <version>${auto.value.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.auto.value</groupId>
+                <artifactId>auto-value</artifactId>
+                <version>${auto.value.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>${jackson.core.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.annotation</groupId>
+                <artifactId>jakarta.annotation-api</artifactId>
+                <version>${jakarta.annotation-api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.vintage</groupId>
+                <artifactId>junit-vintage-engine</artifactId>
+                <scope>test</scope>
+                <version>${junit-vintage-engine.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-api</artifactId>
+                <version>${junit-jupiter-api.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-params</artifactId>
+                <scope>test</scope>
+                <version>${junit-jupiter-params}</version>
+            </dependency>
+            <dependency>
+                <groupId>joda-time</groupId>
+                <artifactId>joda-time</artifactId>
+                <version>${joda-time.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.awaitility</groupId>
+                <artifactId>awaitility</artifactId>
+                <version>${awaitility.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.google.auto.service</groupId>
+                <artifactId>auto-service</artifactId>
+                <scope>provided</scope>
+                <version>${auto-service.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-annotations</artifactId>
+                <version>${swagger-annotations.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-test</artifactId>
+                <version>${spring-boot.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${google.guava.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.resilience4j</groupId>
+                <artifactId>resilience4j-prometheus</artifactId>
+                <version>${r4j.prometeus.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.prometheus</groupId>
+                <artifactId>simpleclient</artifactId>
+                <version>${prometeus.simpleclient.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.validation</groupId>
+                <artifactId>jakarta.validation-api</artifactId>
+                <version>${jakarta.validation.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.datatype</groupId>
+                <artifactId>jackson-datatype-joda</artifactId>
+                <version>${jackson.datatype.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.resilience4j</groupId>
+                <artifactId>resilience4j-circuitbreaker</artifactId>
+                <version>${resilience4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.resilience4j</groupId>
+                <artifactId>resilience4j-bulkhead</artifactId>
+                <version>${resilience4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.resilience4j</groupId>
+                <artifactId>resilience4j-core</artifactId>
+                <version>${resilience4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.assertj</groupId>
+                <artifactId>assertj-core</artifactId>
+                <version>${assertj.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-core</artifactId>
+                <version>${flywaydb.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>${postgresql.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jooq</groupId>
+                <artifactId>jooq-meta</artifactId>
+                <version>${jooq.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>testcontainers</artifactId>
+                <version>${testcontainers.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>rabbitmq</artifactId>
+                <version>${testcontainers.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>${testcontainers.version}</version>
+                <scope>test</scope>
+                <exclusions>
+                    <exclusion>
+                        <groupId>javax.annotation</groupId>
+                        <artifactId>javax.annotation-api</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>javax.xml.bind</groupId>
+                        <artifactId>jaxb-api</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>junit</groupId>
+                        <artifactId>junit</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.jooq</groupId>
+                <artifactId>jooq</artifactId>
+                <version>${jooq.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>javax.xml.bind</groupId>
+                        <artifactId>jaxb-api</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>timestamp-property</id>
+                        <goals>
+                            <goal>timestamp-property</goal>
+                        </goals>
+                        <phase>validate</phase>
+                        <configuration>
+                            <name>current.year</name>
+                            <pattern>yyyy</pattern>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <version>2.0.0</version>
+                <executions>
+                    <execution>
+                        <id>generate-third-party-dependency-licenses-report</id>
+                        <goals>
+                            <goal>aggregate-add-third-party</goal>
+                        </goals>
+                        <phase>validate</phase>
+                        <configuration>
+                            <outputDirectory>./..</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <version>4.0.rc2</version>
+                <configuration>
+                    <defaultProperties>
+                        <!--suppress UnresolvedMavenProperty -->
+                        <license.year>${current.year}</license.year>
+                        <license.owner>Liberty Global Technology Services BV</license.owner>
+                    </defaultProperties>
+                    <failIfUnknown>true</failIfUnknown>
+                    <aggregate>true</aggregate>
+                    <mapping>
+                        <conf>SCRIPT_STYLE</conf>
+                        <Dockerfile>SCRIPT_STYLE</Dockerfile>
+                        <tpl>SCRIPT_STYLE</tpl>
+                    </mapping>
+                    <licenseSets>
+                        <licenseSet>
+                            <header>LICENSE-HEADER-TEMPLATE.txt</header>
+                            <includes>**/*.java,**/*.sql,**/*.conf,**/Dockerfile,**/*.yaml,**/*.groovy,**/*.yml,**/*.tpl</includes>
+                        </licenseSet>
+                    </licenseSets>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>check-license-headers</id>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <phase>prepare-package</phase>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
