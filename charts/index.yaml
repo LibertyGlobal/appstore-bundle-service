@@ -2,8 +2,21 @@ apiVersion: v1
 entries:
   appstore-bundle-service:
   - apiVersion: v1
+    appVersion: 0.16.1
+    created: "2023-06-14T07:51:19.412251954Z"
+    description: Appstore Bundle Service
+    digest: 69dacb33fb4ae1d31adb4ea3551ca407c5f8cba05a3b11a3f382f9085b643a65
+    home: https://github.com/LibertyGlobal/appstore-bundle-service
+    kubeVersion: '>=1.12.0-0'
+    name: appstore-bundle-service
+    sources:
+    - https://github.com/LibertyGlobal/appstore-bundle-service
+    urls:
+    - https://libertyglobal.github.io/appstore-bundle-service/charts/appstore-bundle-service-0.16.1.tgz
+    version: 0.16.1
+  - apiVersion: v1
     appVersion: 0.15.0
-    created: "2023-06-13T10:04:11.118000893Z"
+    created: "2023-06-14T07:51:19.411813551Z"
     description: Appstore Bundle Service
     digest: 56b0dcf922c832f732216487dbda7bef483ae519250706623a320661bcb05840
     home: https://github.com/LibertyGlobal/appstore-bundle-service
@@ -14,4 +27,4 @@ entries:
     urls:
     - https://libertyglobal.github.io/appstore-bundle-service/charts/appstore-bundle-service-0.15.0.tgz
     version: 0.15.0
-generated: "2023-06-13T10:04:11.116365867Z"
+generated: "2023-06-14T07:51:19.411135046Z"
