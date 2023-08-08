@@ -67,6 +67,7 @@ class AppstoreMetadataServiceClientTest {
     private static final String MAINTAINER_CODE = "MAINTAINER_CODE";
     private static final String PLATFORM_NAME_QUERY_PARAM = "platformName";
     private static final String FIRMWARE_VER_QUERY_PARAM = "firmwareVer";
+    private static final boolean ENCRYPTION_ENABLED = true;
     private static final WireMockClassRule WIREMOCK = new WireMockClassRule(Options.DYNAMIC_PORT);
     private AppstoreMetadataServiceClient appstoreMetadataServiceClient;
     private CircuitBreaker circuitBreaker;
@@ -154,7 +155,7 @@ class AppstoreMetadataServiceClientTest {
     void shouldExtractApplicationMetadataByMaintainerCodeOnSuccess() throws JsonProcessingException {
         // GIVEN
         ApplicationMetadataForMaintainer expected =
-                ApplicationMetadataForMaintainer.create(HeaderForMaintainer.create(APP_ID, APP_NAME, APP_VER, APP_URL, OCI_IMAGE_URL));
+                ApplicationMetadataForMaintainer.create(HeaderForMaintainer.create(APP_ID, APP_NAME, APP_VER, APP_URL, ENCRYPTION_ENABLED, OCI_IMAGE_URL));
 
         WIREMOCK.stubFor(get(new UrlPattern(containing("/maintainers/" + MAINTAINER_CODE +"/apps/" + APP_ID + "%3A" + APP_VER), false))
                 .withQueryParam(PLATFORM_NAME_QUERY_PARAM, equalTo(PLATFORM_NAME))

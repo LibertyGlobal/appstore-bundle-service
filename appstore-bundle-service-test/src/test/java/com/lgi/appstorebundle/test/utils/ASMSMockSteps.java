@@ -82,8 +82,9 @@ public class ASMSMockSteps {
     }
 
     @Step("Stub Appstore Metadata Service for getting a application metadata for maintainer with status code SC_OK for AppId: {0}, AppVer: {1}, PlatformName: {2}, FirmwareVer: {3}, MaintainerCode: {4}")
-    public void stubASMSWithApplicationMetadataForMaintainerInResponseBody(String appId, String appVer, String platformName, String firmwareVersion, String maintainerCode, String appName, String appUrl, String ociImageUrl) throws JsonProcessingException {
-        ApplicationMetadataForMaintainer expected = ApplicationMetadataForMaintainer.create(HeaderForMaintainer.create(appId, appName, appVer, appUrl, ociImageUrl));
+    public void stubASMSWithApplicationMetadataForMaintainerInResponseBody(String appId, String appVer, String platformName, String firmwareVersion, String maintainerCode,
+                                                                           String appName, String appUrl, boolean encryption, String ociImageUrl) throws JsonProcessingException {
+        ApplicationMetadataForMaintainer expected = ApplicationMetadataForMaintainer.create(HeaderForMaintainer.create(appId, appName, appVer, appUrl, encryption, ociImageUrl));
         asmsWiremock.addStubMapping(get(urlPathEqualTo("/maintainers/" + maintainerCode + "/apps/" + appId + SEMICOLON_URL_ENC + appVer))
                 .withQueryParam("firmwareVer", equalTo(firmwareVersion))
                 .withQueryParam("platformName", equalTo(platformName))

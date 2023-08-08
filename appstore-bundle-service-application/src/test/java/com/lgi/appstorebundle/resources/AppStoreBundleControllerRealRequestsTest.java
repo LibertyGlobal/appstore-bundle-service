@@ -29,6 +29,7 @@ import com.lgi.appstorebundle.external.asms.model.HeaderForMaintainer;
 import com.lgi.appstorebundle.external.asms.model.Maintainer;
 import com.lgi.appstorebundle.service.ApplicationMetadataService;
 import com.lgi.appstorebundle.service.BundleService;
+import com.lgi.appstorebundle.util.EncryptionHelper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -62,7 +63,8 @@ class AppStoreBundleControllerRealRequestsTest {
     private static final String OCI_IMAGE_URL = "ociImageUrl";
     private static final String APP_BUNDLE_NAME = "applicationBundleName";
     private static final String X_REQUEST_ID = "0293e324-0558-4f23-b924-25a8b3f59583";
-    private final HeaderForMaintainer applicationHeaderForMaintainer = HeaderForMaintainer.create(APP_ID, APP_NAME, APP_VER, URL, OCI_IMAGE_URL);
+    private static final boolean ENCRYPTION_ENABLED = true;
+    private final HeaderForMaintainer applicationHeaderForMaintainer = HeaderForMaintainer.create(APP_ID, APP_NAME, APP_VER, URL, ENCRYPTION_ENABLED, OCI_IMAGE_URL);
     private final Header applicationHeader = Header.create(APP_ID, APP_NAME, APP_VER, URL);
     private final Maintainer applicationMaintainer = Maintainer.create("maintainerCode");
     private final ApplicationMetadataForMaintainer applicationMetadataForMaintainer = ApplicationMetadataForMaintainer.create(applicationHeaderForMaintainer);
@@ -82,6 +84,9 @@ class AppStoreBundleControllerRealRequestsTest {
 
     @MockBean
     private BundleService bundleServiceMock;
+
+    @MockBean
+    private EncryptionHelper encryptionHelper;
 
     @Test
     void givenValidRequestWhenApplicationDoesNotExistThenNotFound() throws Exception {

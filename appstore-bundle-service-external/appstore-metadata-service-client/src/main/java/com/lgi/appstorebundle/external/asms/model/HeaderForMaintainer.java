@@ -23,6 +23,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
+import javax.annotation.Nullable;
+
 @AutoValue
 @JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class HeaderForMaintainer {
@@ -35,6 +37,9 @@ public abstract class HeaderForMaintainer {
 
     public abstract String getUrl();
 
+    @Nullable
+    public abstract Boolean getEncryption();
+
     public abstract String getOciImageUrl();
 
     @JsonCreator
@@ -43,7 +48,8 @@ public abstract class HeaderForMaintainer {
             @JsonProperty("name") String name,
             @JsonProperty("version") String version,
             @JsonProperty("url") String url,
+            @JsonProperty("encryption") Boolean encryption,
             @JsonProperty("ociImageUrl") String ociImageUrl) {
-        return new AutoValue_HeaderForMaintainer(id, name, version, url, ociImageUrl);
+        return new AutoValue_HeaderForMaintainer(id, name, version, url, encryption, ociImageUrl);
     }
 }

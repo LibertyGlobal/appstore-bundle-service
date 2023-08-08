@@ -41,9 +41,9 @@
         <jackson.core.version>2.14.2</jackson.core.version>
         <jackson.datatype.version>2.14.2</jackson.datatype.version>
         <jakarta.annotation-api.version>1.3.5</jakarta.annotation-api.version>
-        <junit-vintage-engine.version>5.9.2</junit-vintage-engine.version>
-        <junit-jupiter-api.version>5.9.2</junit-jupiter-api.version>
-        <junit-jupiter-params>5.9.2</junit-jupiter-params>
+        <junit-vintage-engine.version>5.8.2</junit-vintage-engine.version>
+        <junit-jupiter-api.version>5.8.2</junit-jupiter-api.version>
+        <junit-jupiter-params>5.8.2</junit-jupiter-params>
         <joda-time.version>2.12.2</joda-time.version>
         <awaitility.version>4.2.0</awaitility.version>
         <auto-service.version>1.0.1</auto-service.version>

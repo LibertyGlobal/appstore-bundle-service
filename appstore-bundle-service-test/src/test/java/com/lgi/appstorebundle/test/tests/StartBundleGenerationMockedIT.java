@@ -56,7 +56,8 @@ public class StartBundleGenerationMockedIT extends MockedBaseIT {
     private static final String PLATFORM_NAME = "PLATFORM_NAME";
     private static final String FIRMWARE_VER = "FIRMWARE_VER";
     private static final String OCI_IMAGE_URL = "OCI_IMAGE_URL";
-    private static final boolean ENCRYPT = true;
+    private static final boolean ENCRYPTION_ENABLED = true;
+    private static final boolean ENCRYPTION_DISABLED = false;
     private static final String X_REQUEST_ID = "1111-1111111-1111";
     private static final String SECOND_X_REQUEST_ID = "2222-22222222-2222";
     private static final String APP_BUNDLE_NAME = "APP_BUNDLE_NAME";
@@ -116,11 +117,11 @@ public class StartBundleGenerationMockedIT extends MockedBaseIT {
 
     @Test
     @Issue("SPARK-36508")
-    @DisplayName("GET: Call startBundleGeneration - Status code 202, bundle stored in DB and message sent")
-    void callRequestBundleWhenGenerationNotTriggered_verifyStartingGenerationWithSendingMessageAndSavingToDB(SoftAssertions softly) throws JsonProcessingException {
+    @DisplayName("GET: Call startBundleGeneration - Status code 202, bundle stored in DB and message sent. Maintainer sets field encryption = true.")
+    void callRequestBundleWhenGenerationNotTriggered_verifyStartingGenerationWithSendingMessageAndSavingToDB_maintainerSetsFieldEncryptionTrue(SoftAssertions softly) throws JsonProcessingException {
         // Given
         asmsMockSteps.stubASMSWithApplicationMetadataInResponseBody(APP_ID, APP_VER, PLATFORM_NAME, FIRMWARE_VER, MAINTAINER_CODE, APP_NAME, APP_URL);
-        asmsMockSteps.stubASMSWithApplicationMetadataForMaintainerInResponseBody(APP_ID, APP_VER, PLATFORM_NAME, FIRMWARE_VER, MAINTAINER_CODE, APP_NAME, APP_URL, OCI_IMAGE_URL);
+        asmsMockSteps.stubASMSWithApplicationMetadataForMaintainerInResponseBody(APP_ID, APP_VER, PLATFORM_NAME, FIRMWARE_VER, MAINTAINER_CODE, APP_NAME, APP_URL, ENCRYPTION_ENABLED, OCI_IMAGE_URL);
 
         // When
         var response = startBundleGenerationEndpoint.startBundleGeneration(VALID_APP_PARAMS, X_REQUEST_ID);
@@ -131,7 +132,28 @@ public class StartBundleGenerationMockedIT extends MockedBaseIT {
                 .as("Wrong HTTP status code received from the service.")
                 .isEqualTo(HttpStatus.SC_ACCEPTED);
         databaseSteps.verifyBundleWasCreated(softly, APP_ID, APP_VER, PLATFORM_NAME, FIRMWARE_VER, GENERATION_REQUESTED, X_REQUEST_ID);
-        final GenerationMessage expectedGenerationMessage = GenerationMessage.create(DUMMY_ID, APP_ID, APP_VER, PLATFORM_NAME, FIRMWARE_VER, OCI_IMAGE_URL, ENCRYPT);
+        final GenerationMessage expectedGenerationMessage = GenerationMessage.create(DUMMY_ID, APP_ID, APP_VER, PLATFORM_NAME, FIRMWARE_VER, OCI_IMAGE_URL, ENCRYPTION_ENABLED);
+        rabbitMQSteps.verifySentGenerationMessage(softly, expectedGenerationMessage, X_REQUEST_ID);
+    }
+
+    @Test
+    @Issue("SPARK-36508")
+    @DisplayName("GET: Call startBundleGeneration - Status code 202, bundle stored in DB and message sent. Maintainer has field encryption = false.")
+    void callRequestBundleWhenGenerationNotTriggered_verifyStartingGenerationWithSendingMessageAndSavingToDB_maintainerSetsFieldEncryptionFalse(SoftAssertions softly) throws JsonProcessingException {
+        // Given
+        asmsMockSteps.stubASMSWithApplicationMetadataInResponseBody(APP_ID, APP_VER, PLATFORM_NAME, FIRMWARE_VER, MAINTAINER_CODE, APP_NAME, APP_URL);
+        asmsMockSteps.stubASMSWithApplicationMetadataForMaintainerInResponseBody(APP_ID, APP_VER, PLATFORM_NAME, FIRMWARE_VER, MAINTAINER_CODE, APP_NAME, APP_URL, ENCRYPTION_DISABLED, OCI_IMAGE_URL);
+
+        // When
+        var response = startBundleGenerationEndpoint.startBundleGeneration(VALID_APP_PARAMS, X_REQUEST_ID);
+        waitDelay();
+
+        // Then
+        softly.assertThat(response.getStatusCode())
+                .as("Wrong HTTP status code received from the service.")
+                .isEqualTo(HttpStatus.SC_ACCEPTED);
+        databaseSteps.verifyBundleWasCreated(softly, APP_ID, APP_VER, PLATFORM_NAME, FIRMWARE_VER, GENERATION_REQUESTED, X_REQUEST_ID);
+        final GenerationMessage expectedGenerationMessage = GenerationMessage.create(DUMMY_ID, APP_ID, APP_VER, PLATFORM_NAME, FIRMWARE_VER, OCI_IMAGE_URL, ENCRYPTION_DISABLED);
         rabbitMQSteps.verifySentGenerationMessage(softly, expectedGenerationMessage, X_REQUEST_ID);
     }
 
@@ -156,7 +178,7 @@ public class StartBundleGenerationMockedIT extends MockedBaseIT {
                 updatedAtForOldRow);
         databaseSteps.saveBundleWithStatus(bundleWithAudit);
         asmsMockSteps.stubASMSWithApplicationMetadataInResponseBody(APP_ID, APP_VER, PLATFORM_NAME, FIRMWARE_VER, MAINTAINER_CODE, APP_NAME, APP_URL);
-        asmsMockSteps.stubASMSWithApplicationMetadataForMaintainerInResponseBody(APP_ID, APP_VER, PLATFORM_NAME, FIRMWARE_VER, MAINTAINER_CODE, APP_NAME, APP_URL, OCI_IMAGE_URL);
+        asmsMockSteps.stubASMSWithApplicationMetadataForMaintainerInResponseBody(APP_ID, APP_VER, PLATFORM_NAME, FIRMWARE_VER, MAINTAINER_CODE, APP_NAME, APP_URL, ENCRYPTION_ENABLED, OCI_IMAGE_URL);
 
         // When
         var response = startBundleGenerationEndpoint.startBundleGeneration(VALID_APP_PARAMS, SECOND_X_REQUEST_ID);
@@ -167,7 +189,7 @@ public class StartBundleGenerationMockedIT extends MockedBaseIT {
                 .as("Wrong HTTP status code received from the service.")
                 .isEqualTo(HttpStatus.SC_ACCEPTED);
         databaseSteps.verifySecondBundleWasAdded(softly, APP_ID, APP_VER, PLATFORM_NAME, FIRMWARE_VER, GENERATION_REQUESTED, SECOND_X_REQUEST_ID, messageTimestampForOldRow, updatedAtForOldRow);
-        final GenerationMessage expectedGenerationMessage = GenerationMessage.create(DUMMY_ID, APP_ID, APP_VER, PLATFORM_NAME, FIRMWARE_VER, OCI_IMAGE_URL, ENCRYPT);
+        final GenerationMessage expectedGenerationMessage = GenerationMessage.create(DUMMY_ID, APP_ID, APP_VER, PLATFORM_NAME, FIRMWARE_VER, OCI_IMAGE_URL, ENCRYPTION_ENABLED);
         rabbitMQSteps.verifySentGenerationMessage(softly, expectedGenerationMessage, SECOND_X_REQUEST_ID);
     }
 
@@ -191,7 +213,7 @@ public class StartBundleGenerationMockedIT extends MockedBaseIT {
                 null);
         databaseSteps.saveBundleWithStatus(bundleWithAudit);
         asmsMockSteps.stubASMSWithApplicationMetadataInResponseBody(APP_ID, APP_VER, PLATFORM_NAME, FIRMWARE_VER, MAINTAINER_CODE, APP_NAME, APP_URL);
-        asmsMockSteps.stubASMSWithApplicationMetadataForMaintainerInResponseBody(APP_ID, APP_VER, PLATFORM_NAME, FIRMWARE_VER, MAINTAINER_CODE, APP_NAME, APP_URL, OCI_IMAGE_URL);
+        asmsMockSteps.stubASMSWithApplicationMetadataForMaintainerInResponseBody(APP_ID, APP_VER, PLATFORM_NAME, FIRMWARE_VER, MAINTAINER_CODE, APP_NAME, APP_URL, ENCRYPTION_ENABLED, OCI_IMAGE_URL);
 
         // When
         var response = startBundleGenerationEndpoint.startBundleGeneration(VALID_APP_PARAMS, SECOND_X_REQUEST_ID);

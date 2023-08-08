@@ -27,6 +27,7 @@ import com.lgi.appstorebundle.external.asms.model.ApplicationMetadata;
 import com.lgi.appstorebundle.external.asms.model.ApplicationMetadataForMaintainer;
 import com.lgi.appstorebundle.service.ApplicationMetadataService;
 import com.lgi.appstorebundle.service.BundleService;
+import com.lgi.appstorebundle.util.EncryptionHelper;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -65,7 +66,7 @@ public class AppStoreBundleController {
     private final Duration retryAfter;
     private final ApplicationMetadataService applicationMetadataService;
     private final BundleService bundleService;
-    private final boolean encrypt;
+    private final EncryptionHelper encryptionHelper;
 
     private static final Predicate<Bundle> IS_NOT_BUNDLE_ERROR = application -> BUNDLE_ERROR != application.getStatus();
 
@@ -73,11 +74,11 @@ public class AppStoreBundleController {
     public AppStoreBundleController(@Value("${http.retry.after}") Duration retryAfter,
                                     ApplicationMetadataService applicationMetadataService,
                                     BundleService bundleService,
-                                    @Value("${bundle.encryption.enabled}") boolean encrypt) {
+                                    EncryptionHelper encryptionHelper) {
         this.retryAfter = checkNotNull(retryAfter, "retryAfter");
         this.applicationMetadataService = applicationMetadataService;
         this.bundleService = bundleService;
-        this.encrypt = encrypt;
+        this.encryptionHelper = checkNotNull(encryptionHelper, "encryptionHelper");
     }
 
     @GetMapping(value = "/{appId}/{appVersion}/{platformName}/{firmwareVersion}/{appBundleName}", produces = {"application/json"})
@@ -99,8 +100,11 @@ public class AppStoreBundleController {
 
         if (maybeBundle.filter(IS_NOT_BUNDLE_ERROR).isEmpty()) {
             final UUID id = randomUUID();
-            LOG.info("Starting a new bundle generation for bundle id:'{}', appId:'{}', appVersion:'{}', platformName:'{}', firmwareVersion:'{}'.", id, appId, appVersion, platformName, firmwareVersion);
-            final BundleContext bundleContext = createBundleContext(id, appId, appVersion, platformName, firmwareVersion, xRequestId, applicationMetadataForMaintainer.getHeader().getOciImageUrl());
+            final boolean encryption = encryptionHelper.isEncryptionEnabled(applicationMetadataForMaintainer);
+            LOG.info("Starting a new bundle generation for bundle id:'{}', appId:'{}', appVersion:'{}', platformName:'{}', firmwareVersion:'{}', calculated encryption:'{}'.",
+                    id, appId, appVersion, platformName, firmwareVersion, encryption);
+            final BundleContext bundleContext = createBundleContext(id, appId, appVersion, platformName, firmwareVersion,
+                    xRequestId, applicationMetadataForMaintainer.getHeader().getOciImageUrl(), encryption);
             bundleService.triggerBundleGeneration(bundleContext);
         }
 
@@ -110,10 +114,11 @@ public class AppStoreBundleController {
                 .build();
     }
 
-    private BundleContext createBundleContext(UUID id, String appId, String appVersion, String platformName, String firmwareVersion, String xRequestId, String ociImageUrl) {
+    private BundleContext createBundleContext(UUID id, String appId, String appVersion, String platformName,
+                                              String firmwareVersion, String xRequestId, String ociImageUrl, boolean encryption) {
         final DateTime messageTimestamp = now(DateTimeZone.UTC);
         final ApplicationContext applicationContext = ApplicationContext.create(appId, appVersion, platformName, firmwareVersion);
         final Bundle bundle = Bundle.create(id, applicationContext, GENERATION_REQUESTED, xRequestId, messageTimestamp);
-        return BundleContext.create(bundle, ociImageUrl, encrypt);
+        return BundleContext.create(bundle, ociImageUrl, encryption);
     }
 }
