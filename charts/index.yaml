@@ -1,28 +1,22 @@
-#
-# If not stated otherwise in this file or this component's LICENSE file the
-# following copyright and licenses apply:
-#
-# Copyright 2023 Liberty Global Technology Services BV
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
-
 apiVersion: v1
 entries:
   appstore-bundle-service:
   - apiVersion: v1
+    appVersion: 0.16.2
+    created: "2023-08-09T08:51:17.710464079Z"
+    description: Appstore Bundle Service
+    digest: 7d0c8c0cb11b17d932ea92a44605a014259ff29c0700af29459821f5eda997e8
+    home: https://github.com/LibertyGlobal/appstore-bundle-service
+    kubeVersion: '>=1.12.0-0'
+    name: appstore-bundle-service
+    sources:
+    - https://github.com/LibertyGlobal/appstore-bundle-service
+    urls:
+    - https://libertyglobal.github.io/appstore-bundle-service/charts/appstore-bundle-service-0.16.2.tgz
+    version: 0.16.2
+  - apiVersion: v1
     appVersion: 0.16.1
-    created: "2023-06-14T07:51:19.412251954Z"
+    created: "2023-08-09T08:51:17.709857745Z"
     description: Appstore Bundle Service
     digest: 69dacb33fb4ae1d31adb4ea3551ca407c5f8cba05a3b11a3f382f9085b643a65
     home: https://github.com/LibertyGlobal/appstore-bundle-service
@@ -35,7 +29,7 @@ entries:
     version: 0.16.1
   - apiVersion: v1
     appVersion: 0.15.0
-    created: "2023-06-14T07:51:19.411813551Z"
+    created: "2023-08-09T08:51:17.709284513Z"
     description: Appstore Bundle Service
     digest: 56b0dcf922c832f732216487dbda7bef483ae519250706623a320661bcb05840
     home: https://github.com/LibertyGlobal/appstore-bundle-service
@@ -46,4 +40,4 @@ entries:
     urls:
     - https://libertyglobal.github.io/appstore-bundle-service/charts/appstore-bundle-service-0.15.0.tgz
     version: 0.15.0
-generated: "2023-06-14T07:51:19.411135046Z"
+generated: "2023-08-09T08:51:17.708226053Z"
