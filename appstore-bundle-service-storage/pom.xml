@@ -6,7 +6,7 @@
     <parent>
         <artifactId>appstore-bundle-service</artifactId>
         <groupId>com.lgi.appstorebundle</groupId>
-        <version>0.16.2-SNAPSHOT</version>
+        <version>0.16.2</version>
     </parent>
 
     <artifactId>appstore-bundle-service-storage</artifactId>
