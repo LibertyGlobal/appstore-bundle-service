@@ -87,7 +87,7 @@ public abstract class BaseContainersIT {
     }
 
     @DynamicPropertySource
-    static void registerProperties(DynamicPropertyRegistry registry) {
+    protected static void registerProperties(DynamicPropertyRegistry registry) {
         registry.add("database.port", postgres::getFirstMappedPort);
         registry.add("database.name", postgres::getDatabaseName);
         registry.add("spring.datasource.hikari.read.username", postgres::getUsername);
