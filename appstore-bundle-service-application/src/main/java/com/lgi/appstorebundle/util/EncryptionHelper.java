@@ -19,20 +19,32 @@
 package com.lgi.appstorebundle.util;
 
 import com.lgi.appstorebundle.external.asms.model.ApplicationMetadataForMaintainer;
+import com.lgi.appstorebundle.model.FeedbackMessage;
+import com.lgi.appstorebundle.service.BundleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 @Component
 public class EncryptionHelper {
     private boolean encrypt;
 
+    private BundleService bundleService;
+
     @Autowired
-    public EncryptionHelper(@Value("${bundle.encryption.enabled}") boolean encrypt) {
+    public EncryptionHelper(@Value("${bundle.encryption.enabled}") boolean encrypt, BundleService bundleService) {
         this.encrypt = encrypt;
+        this.bundleService = checkNotNull(bundleService, "bundleService");
     }
+
 
     public boolean isEncryptionEnabled(ApplicationMetadataForMaintainer applicationMetadataForMaintainer) {
         return encrypt && Boolean.TRUE.equals(applicationMetadataForMaintainer.getHeader().getEncryption());
+    }
+
+    public boolean isEncryptionEnabled(FeedbackMessage feedbackMessage) {
+        return encrypt && bundleService.isEncryptionEnabled(feedbackMessage.getId());
     }
 }

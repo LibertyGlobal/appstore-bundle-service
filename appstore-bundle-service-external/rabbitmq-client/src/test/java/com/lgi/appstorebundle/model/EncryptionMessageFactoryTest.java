@@ -36,10 +36,11 @@ class EncryptionMessageFactoryTest {
     private static final String X_REQ_ID = "x-request-id-value";
     private static final Environment ENV = Environment.DEV;
     private static final String BUNDLE_EXTENSION = "tar.gz";
+    private static final boolean ENCRYPTION_DISABLED = false;
 
     private static final Bundle BUNDLE = Bundle.create(randomUUID(),
             ApplicationContext.create("appId", "appVer", "platformName", "firmwareVer"),
-            BundleStatus.ENCRYPTION_LAUNCHED, X_REQ_ID, DateTime.now(DateTimeZone.UTC));
+            BundleStatus.ENCRYPTION_LAUNCHED, X_REQ_ID, DateTime.now(DateTimeZone.UTC), ENCRYPTION_DISABLED);
 
     private EncryptionMessageFactory factory;
 

@@ -61,7 +61,8 @@ public class DatabaseSteps {
                                         r.getFirmwareVersion()),
                                 BundleStatus.valueOf(r.getStatus()),
                                 r.getXRequestId(),
-                                r.getMessageTimestamp()
+                                r.getMessageTimestamp(),
+                                r.getEncryption()
                         ),
                         r.getCreatedAt(),
                         r.getUpdatedAt())
@@ -82,7 +83,8 @@ public class DatabaseSteps {
                                         r.getFirmwareVersion()),
                                 BundleStatus.valueOf(r.getStatus()),
                                 r.getXRequestId(),
-                                r.getMessageTimestamp()
+                                r.getMessageTimestamp(),
+                                r.getEncryption()
                         ),
                         r.getCreatedAt(),
                         r.getUpdatedAt())
@@ -106,7 +108,8 @@ public class DatabaseSteps {
                                         r.getFirmwareVersion()),
                                 BundleStatus.valueOf(r.getStatus()),
                                 r.getXRequestId(),
-                                r.getMessageTimestamp()
+                                r.getMessageTimestamp(),
+                                r.getEncryption()
                         ),
                         r.getCreatedAt(),
                         r.getUpdatedAt())
@@ -129,7 +132,8 @@ public class DatabaseSteps {
                             BUNDLE.X_REQUEST_ID,
                             BUNDLE.MESSAGE_TIMESTAMP,
                             BUNDLE.CREATED_AT,
-                            BUNDLE.UPDATED_AT
+                            BUNDLE.UPDATED_AT,
+                            BUNDLE.ENCRYPTION
                     ).values(
                             bundle.getId(),
                             applicationContext.getApplicationId(),
@@ -140,7 +144,8 @@ public class DatabaseSteps {
                             bundle.getXRequestId(),
                             bundle.getMessageTimestamp(),
                             bundleWithAudit.getCreatedAt(),
-                            bundleWithAudit.getUpdatedAt()
+                            bundleWithAudit.getUpdatedAt(),
+                            bundle.isEncryptionEnabled()
                     )
                     .execute();
         });
@@ -189,8 +194,8 @@ public class DatabaseSteps {
                 .isNull();
     }
 
-    @Step("Verify bundle was updated in DB, Id: {1}, AppId: {2}, AppVer: {3}, PlatformName: {4}, FirmwareVer: {5}, Status: {6}, xRequestId: {7}, messageTimestampBeforeUpdate: {8}, createdAtBeforeUpdate: {9}, updatedAtBeforeUpdate: {10}")
-    public void verifyBundleWasUpdated(SoftAssertions softly, UUID id, String expectedAppId, String expectedAppVer, String expectedPlatformName, String expectedFirmwareVersion, BundleStatus expectedStatus, String expectedXRequestId, DateTime messageTimestampForOldRow, DateTime createdAtForOldRow, DateTime updatedAtForOldRow) {
+    @Step("Verify bundle was updated in DB, Id: {1}, AppId: {2}, AppVer: {3}, PlatformName: {4}, FirmwareVer: {5}, Status: {6}, xRequestId: {7}, Encryption {8}, messageTimestampBeforeUpdate: {9}, createdAtBeforeUpdate: {10}, updatedAtBeforeUpdate: {11}")
+    public void verifyBundleWasUpdated(SoftAssertions softly, UUID id, String expectedAppId, String expectedAppVer, String expectedPlatformName, String expectedFirmwareVersion, BundleStatus expectedStatus, String expectedXRequestId, boolean expectedEncryption, DateTime messageTimestampForOldRow, DateTime createdAtForOldRow, DateTime updatedAtForOldRow) {
         final Optional<BundleWithAudit> actualBundleWithAudit = getBundleWithAudit(id);
         softly.assertThat(actualBundleWithAudit)
                 .as("Bundle not stored in DB.")
@@ -216,6 +221,9 @@ public class DatabaseSteps {
         softly.assertThat(actualBundle.getXRequestId())
                 .as("Bundle from DB contains a wrong xRequestId.")
                 .isEqualTo(expectedXRequestId);
+        softly.assertThat(actualBundle.isEncryptionEnabled())
+                .as("Bundle from DB contains a wrong Encryption.")
+                .isEqualTo(expectedEncryption);
         softly.assertThat(actualBundle.getMessageTimestamp().withZone(DateTimeZone.UTC))
                 .as("Bundle from DB contains a wrong MessageTimestamp.")
                 .isGreaterThan(messageTimestampForOldRow);

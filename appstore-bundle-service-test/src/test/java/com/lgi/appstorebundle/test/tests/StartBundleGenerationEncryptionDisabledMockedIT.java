@@ -76,11 +76,11 @@ public class StartBundleGenerationEncryptionDisabledMockedIT extends MockedBaseI
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     @DisplayName("GET: Call startBundleGeneration - Status code 202, bundle stored in DB and message sent (bundle.encryption.enabled = false)")
-    void callRequestBundleWhenGenerationNotTriggered_verifyStartingGenerationWithSendingMessageAndSavingToDB(boolean encryption, SoftAssertions softly) throws JsonProcessingException {
+    void callRequestBundleWhenGenerationNotTriggered_verifyStartingGenerationWithSendingMessageAndSavingToDB(boolean isEncryptionEnabled, SoftAssertions softly) throws JsonProcessingException {
         // Given
         asmsMockSteps.stubASMSWithApplicationMetadataInResponseBody(APP_ID, APP_VER, PLATFORM_NAME, FIRMWARE_VER, MAINTAINER_CODE, APP_NAME, APP_URL);
         asmsMockSteps.stubASMSWithApplicationMetadataForMaintainerInResponseBody(APP_ID, APP_VER, PLATFORM_NAME, FIRMWARE_VER, MAINTAINER_CODE, APP_NAME, APP_URL,
-                encryption, OCI_IMAGE_URL);
+                isEncryptionEnabled, OCI_IMAGE_URL);
 
         // When
         var response = startBundleGenerationEndpoint.startBundleGeneration(VALID_APP_PARAMS, X_REQUEST_ID);

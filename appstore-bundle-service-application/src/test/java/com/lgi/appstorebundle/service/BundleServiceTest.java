@@ -31,10 +31,14 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.MockitoAnnotations;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -68,7 +72,7 @@ class BundleServiceTest {
     private final BundleService service = new BundleService(dao, rabbitMQ, encryptionMessageFactory);
     private final DateTime messageTimestamp = now(DateTimeZone.UTC);
     private final ApplicationContext applicationContext = ApplicationContext.create(APP_ID, APP_VERSION, PLATFORM_NAME, FIRMWARE_VERSION);
-    private final Bundle bundle = Bundle.create(ID, applicationContext, GENERATION_REQUESTED, X_REQUEST_ID, messageTimestamp);
+    private final Bundle bundle = Bundle.create(ID, applicationContext, GENERATION_REQUESTED, X_REQUEST_ID, messageTimestamp, true);
     private final BundleContext bundleContext = BundleContext.create(bundle, OCI_IMAGE_URL, true);
 
     @Captor
@@ -148,5 +152,27 @@ class BundleServiceTest {
         verify(dao, times(2)).updateStatusForBundle(any(), bundleStatusCaptor.capture(), any());
         verify(rabbitMQ).sendEncryptionMessage(any(), any());
         assertEquals(BundleStatus.BUNDLE_ERROR, bundleStatusCaptor.getValue());
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void testEncryption(Boolean dbValue, boolean expectedValue) {
+        // GIVEN
+        UUID bundleId = bundle.getId();
+        when(dao.isEncryptionEnabled(bundleId)).thenReturn(Optional.ofNullable(dbValue));
+
+        // WHEN
+        boolean result = service.isEncryptionEnabled(bundle.getId());
+
+        // THEN
+        assertEquals(expectedValue, result);
+    }
+
+    private static List<Arguments> testEncryption() {
+        return List.of(
+                Arguments.of(Boolean.TRUE, true),
+                Arguments.of(Boolean.FALSE, false),
+                Arguments.of(null, false)
+        );
     }
 }

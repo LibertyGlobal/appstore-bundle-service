@@ -100,11 +100,11 @@ public class AppStoreBundleController {
 
         if (maybeBundle.filter(IS_NOT_BUNDLE_ERROR).isEmpty()) {
             final UUID id = randomUUID();
-            final boolean encryption = encryptionHelper.isEncryptionEnabled(applicationMetadataForMaintainer);
+            final boolean isEncryptionEnabled = encryptionHelper.isEncryptionEnabled(applicationMetadataForMaintainer);
             LOG.info("Starting a new bundle generation for bundle id:'{}', appId:'{}', appVersion:'{}', platformName:'{}', firmwareVersion:'{}', calculated encryption:'{}'.",
-                    id, appId, appVersion, platformName, firmwareVersion, encryption);
+                    id, appId, appVersion, platformName, firmwareVersion, isEncryptionEnabled);
             final BundleContext bundleContext = createBundleContext(id, appId, appVersion, platformName, firmwareVersion,
-                    xRequestId, applicationMetadataForMaintainer.getHeader().getOciImageUrl(), encryption);
+                    xRequestId, applicationMetadataForMaintainer.getHeader().getOciImageUrl(), isEncryptionEnabled);
             bundleService.triggerBundleGeneration(bundleContext);
         }
 
@@ -115,10 +115,10 @@ public class AppStoreBundleController {
     }
 
     private BundleContext createBundleContext(UUID id, String appId, String appVersion, String platformName,
-                                              String firmwareVersion, String xRequestId, String ociImageUrl, boolean encryption) {
+                                              String firmwareVersion, String xRequestId, String ociImageUrl, boolean isEncryptionEnabled) {
         final DateTime messageTimestamp = now(DateTimeZone.UTC);
         final ApplicationContext applicationContext = ApplicationContext.create(appId, appVersion, platformName, firmwareVersion);
-        final Bundle bundle = Bundle.create(id, applicationContext, GENERATION_REQUESTED, xRequestId, messageTimestamp);
-        return BundleContext.create(bundle, ociImageUrl, encryption);
+        final Bundle bundle = Bundle.create(id, applicationContext, GENERATION_REQUESTED, xRequestId, messageTimestamp, isEncryptionEnabled);
+        return BundleContext.create(bundle, ociImageUrl, isEncryptionEnabled);
     }
 }

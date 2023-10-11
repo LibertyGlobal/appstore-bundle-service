@@ -87,4 +87,11 @@ public class BundleService {
             });
         }, () -> LOG.warn("Could not find a bundle for id '{}', will not send it for encryption.", id));
     }
+
+    public boolean isEncryptionEnabled(UUID id) {
+        return bundleDao.isEncryptionEnabled(id).orElseGet(() -> {
+            LOG.warn("Could not find a bundle for id '{}', will not send it for encryption.", id);
+            return false;
+        });
+    }
 }

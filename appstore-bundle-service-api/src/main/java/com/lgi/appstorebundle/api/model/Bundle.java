@@ -36,7 +36,9 @@ public abstract class Bundle {
 
     public abstract DateTime getMessageTimestamp();
 
-    public static Bundle create(UUID id, ApplicationContext applicationContext, BundleStatus status, String xRequestId, DateTime messageTimestamp) {
-        return new AutoValue_Bundle(id, applicationContext, status, xRequestId, messageTimestamp);
+    public abstract boolean isEncryptionEnabled();
+
+    public static Bundle create(UUID id, ApplicationContext applicationContext, BundleStatus status, String xRequestId, DateTime messageTimestamp, boolean encryptionEnabled) {
+        return new AutoValue_Bundle(id, applicationContext, status, xRequestId, messageTimestamp, encryptionEnabled);
     }
 }

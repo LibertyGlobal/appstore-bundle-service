@@ -173,7 +173,8 @@ public class StartBundleGenerationMockedIT extends MockedBaseIT {
                         ApplicationContext.create(APP_ID, APP_VER, PLATFORM_NAME, FIRMWARE_VER),
                         BUNDLE_ERROR,
                         X_REQUEST_ID,
-                        messageTimestampForOldRow),
+                        messageTimestampForOldRow,
+                        ENCRYPTION_DISABLED),
                 createdAtForOldRow,
                 updatedAtForOldRow);
         databaseSteps.saveBundleWithStatus(bundleWithAudit);
@@ -208,12 +209,13 @@ public class StartBundleGenerationMockedIT extends MockedBaseIT {
                         ApplicationContext.create(APP_ID, APP_VER, PLATFORM_NAME, FIRMWARE_VER),
                         GENERATION_REQUESTED,
                         X_REQUEST_ID,
-                        messageTimestampForOldRow),
+                        messageTimestampForOldRow,
+                        ENCRYPTION_DISABLED),
                 createdAtForOldRow,
                 null);
         databaseSteps.saveBundleWithStatus(bundleWithAudit);
         asmsMockSteps.stubASMSWithApplicationMetadataInResponseBody(APP_ID, APP_VER, PLATFORM_NAME, FIRMWARE_VER, MAINTAINER_CODE, APP_NAME, APP_URL);
-        asmsMockSteps.stubASMSWithApplicationMetadataForMaintainerInResponseBody(APP_ID, APP_VER, PLATFORM_NAME, FIRMWARE_VER, MAINTAINER_CODE, APP_NAME, APP_URL, ENCRYPTION_ENABLED, OCI_IMAGE_URL);
+        asmsMockSteps.stubASMSWithApplicationMetadataForMaintainerInResponseBody(APP_ID, APP_VER, PLATFORM_NAME, FIRMWARE_VER, MAINTAINER_CODE, APP_NAME, APP_URL, ENCRYPTION_DISABLED, OCI_IMAGE_URL);
 
         // When
         var response = startBundleGenerationEndpoint.startBundleGeneration(VALID_APP_PARAMS, SECOND_X_REQUEST_ID);

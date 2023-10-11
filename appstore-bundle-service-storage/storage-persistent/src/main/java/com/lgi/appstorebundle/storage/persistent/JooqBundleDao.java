@@ -24,6 +24,7 @@ import com.lgi.appstorebundle.api.model.BundleStatus;
 import com.lgi.appstorebundle.jooq.generated.tables.records.BundleRecord;
 import org.joda.time.DateTime;
 import org.jooq.DSLContext;
+import org.jooq.Record1;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -80,7 +81,8 @@ public class JooqBundleDao implements BundleDao {
                                 BUNDLE.STATUS,
                                 BUNDLE.X_REQUEST_ID,
                                 BUNDLE.CREATED_AT,
-                                BUNDLE.MESSAGE_TIMESTAMP
+                                BUNDLE.MESSAGE_TIMESTAMP,
+                                BUNDLE.ENCRYPTION
                         ).values(
                                 bundle.getId(),
                                 bundle.getApplicationContext().getApplicationId(),
@@ -90,7 +92,8 @@ public class JooqBundleDao implements BundleDao {
                                 bundle.getStatus().name(),
                                 bundle.getXRequestId(),
                                 now(),
-                                bundle.getMessageTimestamp()
+                                bundle.getMessageTimestamp(),
+                                bundle.isEncryptionEnabled()
                         )
                         .execute());
     }
@@ -121,6 +124,14 @@ public class JooqBundleDao implements BundleDao {
         return numberOfUpdatedRow > 0;
     }
 
+    @Override
+    public Optional<Boolean> isEncryptionEnabled(UUID id) {
+        return readDslContext.select(BUNDLE.ENCRYPTION)
+                .from(BUNDLE)
+                .where(BUNDLE.ID.eq(id))
+                .fetchOptional(Record1::value1);
+    }
+
     private static Bundle toBundle(BundleRecord bundleRecord) {
         return Bundle.create(
                 bundleRecord.getId(),
@@ -131,7 +142,8 @@ public class JooqBundleDao implements BundleDao {
                         bundleRecord.get(BUNDLE.FIRMWARE_VERSION)),
                 BundleStatus.valueOf(bundleRecord.get(BUNDLE.STATUS)),
                 bundleRecord.get(BUNDLE.X_REQUEST_ID),
-                bundleRecord.get(BUNDLE.MESSAGE_TIMESTAMP)
+                bundleRecord.get(BUNDLE.MESSAGE_TIMESTAMP),
+                bundleRecord.get(BUNDLE.ENCRYPTION)
         );
     }
 }

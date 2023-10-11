@@ -57,6 +57,8 @@ public class ConsumeFeedbackMessageMockedIT extends MockedBaseIT {
     private static final String PLATFORM_NAME = "PLATFORM_NAME";
     private static final String FIRMWARE_VER = "FIRMWARE_VER";
     private static final String X_REQUEST_ID = "1111-1111111-1111";
+    private static final boolean ENCRYPTION_ENABLED = true;
+    private static final boolean ENCRYPTION_DISABLED = false;
 
     @Autowired
     EncryptionMessageFactory encryptionMessageFactory;
@@ -84,7 +86,8 @@ public class ConsumeFeedbackMessageMockedIT extends MockedBaseIT {
                         ApplicationContext.create(APP_ID, APP_VER, PLATFORM_NAME, FIRMWARE_VER),
                         GENERATION_REQUESTED,
                         xRequestId,
-                        messageTimestampForOldRow),
+                        messageTimestampForOldRow,
+                        ENCRYPTION_DISABLED),
                 createdAtForOldRow,
                 null);
         databaseSteps.saveBundleWithStatus(bundleWithAudit);
@@ -94,7 +97,8 @@ public class ConsumeFeedbackMessageMockedIT extends MockedBaseIT {
         waitDelay();
 
         // Then
-        databaseSteps.verifyBundleWasUpdated(softly, bundleWithAudit.getBundle().getId(), APP_ID, APP_VER, PLATFORM_NAME, FIRMWARE_VER, GENERATION_LAUNCHED, xRequestId, messageTimestampForOldRow, createdAtForOldRow, null);
+        rabbitMQSteps.verifyNotSentGenerationMessage(softly);
+        databaseSteps.verifyBundleWasUpdated(softly, bundleWithAudit.getBundle().getId(), APP_ID, APP_VER, PLATFORM_NAME, FIRMWARE_VER, GENERATION_LAUNCHED, xRequestId, ENCRYPTION_DISABLED, messageTimestampForOldRow, createdAtForOldRow, null);
     }
 
     @Test
@@ -113,7 +117,8 @@ public class ConsumeFeedbackMessageMockedIT extends MockedBaseIT {
                         ApplicationContext.create(APP_ID, APP_VER, PLATFORM_NAME, FIRMWARE_VER),
                         GENERATION_LAUNCHED,
                         X_REQUEST_ID,
-                        messageTimestampForOldRow),
+                        messageTimestampForOldRow,
+                        ENCRYPTION_ENABLED),
                 createdAtForOldRow,
                 updatedAtForOldRow);
         databaseSteps.saveBundleWithStatus(bundleWithAudit);
@@ -124,7 +129,7 @@ public class ConsumeFeedbackMessageMockedIT extends MockedBaseIT {
 
         // Then
         rabbitMQSteps.verifySentEncryptionMessage(softly, encryptionMessageFactory.fromBundle(bundleWithAudit.getBundle()), X_REQUEST_ID);
-        databaseSteps.verifyBundleWasUpdated(softly, bundleWithAudit.getBundle().getId(), APP_ID, APP_VER, PLATFORM_NAME, FIRMWARE_VER, ENCRYPTION_REQUESTED, X_REQUEST_ID, messageTimestampForOldRow, createdAtForOldRow, updatedAtForOldRow);
+        databaseSteps.verifyBundleWasUpdated(softly, bundleWithAudit.getBundle().getId(), APP_ID, APP_VER, PLATFORM_NAME, FIRMWARE_VER, ENCRYPTION_REQUESTED, X_REQUEST_ID, ENCRYPTION_ENABLED, messageTimestampForOldRow, createdAtForOldRow, updatedAtForOldRow);
     }
 
     @Test
@@ -143,7 +148,8 @@ public class ConsumeFeedbackMessageMockedIT extends MockedBaseIT {
                         ApplicationContext.create(APP_ID, APP_VER, PLATFORM_NAME, FIRMWARE_VER),
                         GENERATION_COMPLETED,
                         X_REQUEST_ID,
-                        messageTimestampForOldRow),
+                        messageTimestampForOldRow,
+                        ENCRYPTION_DISABLED),
                 createdAtForOldRow,
                 updatedAtForOldRow);
         databaseSteps.saveBundleWithStatus(bundleWithAudit);
@@ -153,6 +159,7 @@ public class ConsumeFeedbackMessageMockedIT extends MockedBaseIT {
         waitDelay();
 
         // Then
+        rabbitMQSteps.verifyNotSentGenerationMessage(softly);
         databaseSteps.verifyBundleWasNotUpdated(softly, bundleWithAudit.getBundle().getId(), GENERATION_COMPLETED, messageTimestampForOldRow, updatedAtForOldRow);
     }
 
@@ -171,7 +178,8 @@ public class ConsumeFeedbackMessageMockedIT extends MockedBaseIT {
                         ApplicationContext.create(APP_ID, APP_VER, PLATFORM_NAME, FIRMWARE_VER),
                         GENERATION_REQUESTED,
                         X_REQUEST_ID,
-                        messageTimestampForOldRow),
+                        messageTimestampForOldRow,
+                        ENCRYPTION_DISABLED),
                 createdAtForOldRow,
                 null);
         databaseSteps.saveBundleWithStatus(bundleWithAudit);
@@ -180,6 +188,7 @@ public class ConsumeFeedbackMessageMockedIT extends MockedBaseIT {
         waitDelay();
 
         // Then
+        rabbitMQSteps.verifyNotSentGenerationMessage(softly);
         databaseSteps.verifyBundleWasNotUpdated(softly, bundleWithAudit.getBundle().getId(), GENERATION_REQUESTED, messageTimestampForOldRow, null);
     }
 
@@ -198,7 +207,8 @@ public class ConsumeFeedbackMessageMockedIT extends MockedBaseIT {
                         ApplicationContext.create(APP_ID, APP_VER, PLATFORM_NAME, FIRMWARE_VER),
                         GENERATION_REQUESTED,
                         X_REQUEST_ID,
-                        messageTimestampForOldRow),
+                        messageTimestampForOldRow,
+                        ENCRYPTION_DISABLED),
                 createdAtForOldRow,
                 null);
         databaseSteps.saveBundleWithStatus(bundleWithAudit);
@@ -207,6 +217,7 @@ public class ConsumeFeedbackMessageMockedIT extends MockedBaseIT {
         waitDelay();
 
         // Then
+        rabbitMQSteps.verifyNotSentGenerationMessage(softly);
         databaseSteps.verifyBundleWasNotUpdated(softly, bundleWithAudit.getBundle().getId(), GENERATION_REQUESTED, messageTimestampForOldRow, null);
     }
 

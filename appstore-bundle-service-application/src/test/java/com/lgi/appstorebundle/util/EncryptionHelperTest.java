@@ -20,6 +20,8 @@ package com.lgi.appstorebundle.util;
 
 import com.lgi.appstorebundle.external.asms.model.ApplicationMetadataForMaintainer;
 import com.lgi.appstorebundle.external.asms.model.HeaderForMaintainer;
+import com.lgi.appstorebundle.model.FeedbackMessage;
+import com.lgi.appstorebundle.service.BundleService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -29,36 +31,68 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class EncryptionHelperTest {
 
+    private final BundleService bundleService = mock(BundleService.class);
+
     @Test
-    void testEncryptionEnabled() {
+    void testEncryptionEnabledForApplicationMetadata() {
         //GIVEN
-        EncryptionHelper encryptionHelper = new EncryptionHelper(true);
+        EncryptionHelper encryptionHelper = new EncryptionHelper(true, bundleService);
         ApplicationMetadataForMaintainer applicationMetadataForMaintainer = createMockApplicationMetadataForMaintainer(true);
 
         //WHEN
-        boolean encryption = encryptionHelper.isEncryptionEnabled(applicationMetadataForMaintainer);
+        boolean isEncryptionEnabled = encryptionHelper.isEncryptionEnabled(applicationMetadataForMaintainer);
 
         //THEN
-        assertTrue(encryption);
+        assertTrue(isEncryptionEnabled);
+    }
+
+    @Test
+    void testEncryptionEnabledForFeedbackMessage() {
+        //GIVEN
+        EncryptionHelper encryptionHelper = new EncryptionHelper(true, bundleService);
+        FeedbackMessage feedbackMessage = mock(FeedbackMessage.class);
+        when(bundleService.isEncryptionEnabled(any())).thenReturn(true);
+
+        //WHEN
+        boolean isEncryptionEnabled = encryptionHelper.isEncryptionEnabled(feedbackMessage);
+
+        //THEN
+        assertTrue(isEncryptionEnabled);
     }
 
     @ParameterizedTest
-    @MethodSource
-    void testEncryptionDisabled(boolean encryptionForHelper, boolean encryptionForMaintainer) {
+    @MethodSource("testEncryptionDisabled")
+    void testEncryptionDisabledForApplicationMetadata(boolean encryptionForHelper, boolean encryptionForMaintainer) {
         //GIVEN
-        EncryptionHelper encryptionHelper = new EncryptionHelper(encryptionForHelper);
+        EncryptionHelper encryptionHelper = new EncryptionHelper(encryptionForHelper, bundleService);
         ApplicationMetadataForMaintainer applicationMetadataForMaintainer = createMockApplicationMetadataForMaintainer(encryptionForMaintainer);
 
         //WHEN
-        boolean encryption = encryptionHelper.isEncryptionEnabled(applicationMetadataForMaintainer);
+        boolean isEncryptionEnabled = encryptionHelper.isEncryptionEnabled(applicationMetadataForMaintainer);
 
         //THEN
-        assertFalse(encryption);
+        assertFalse(isEncryptionEnabled);
+    }
+
+    @ParameterizedTest
+    @MethodSource("testEncryptionDisabled")
+    void testEncryptionDisabledForFeedbackMessage(boolean encryptionForHelper, boolean encryptionForBundle) {
+        //GIVEN
+        EncryptionHelper encryptionHelper = new EncryptionHelper(encryptionForHelper, bundleService);
+        FeedbackMessage feedbackMessage = mock(FeedbackMessage.class);
+        when(bundleService.isEncryptionEnabled(any())).thenReturn(encryptionForBundle);
+
+        //WHEN
+        boolean isEncryptionEnabled = encryptionHelper.isEncryptionEnabled(feedbackMessage);
+
+        //THEN
+        assertFalse(isEncryptionEnabled);
     }
 
     private static List<Arguments> testEncryptionDisabled() {
@@ -69,9 +103,9 @@ class EncryptionHelperTest {
         );
     }
 
-    private ApplicationMetadataForMaintainer createMockApplicationMetadataForMaintainer(boolean encryption) {
+    private ApplicationMetadataForMaintainer createMockApplicationMetadataForMaintainer(boolean isEncryptionEnabled) {
         HeaderForMaintainer headerForMaintainer = mock(HeaderForMaintainer.class);
-        when(headerForMaintainer.getEncryption()).thenReturn(encryption);
+        when(headerForMaintainer.getEncryption()).thenReturn(isEncryptionEnabled);
 
         ApplicationMetadataForMaintainer applicationMetadataForMaintainer = mock(ApplicationMetadataForMaintainer.class);
         when(applicationMetadataForMaintainer.getHeader()).thenReturn(headerForMaintainer);

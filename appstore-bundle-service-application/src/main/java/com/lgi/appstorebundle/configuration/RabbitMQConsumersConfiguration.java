@@ -26,6 +26,7 @@ import com.lgi.appstorebundle.external.RabbitMQConsumer;
 import com.lgi.appstorebundle.model.FeedbackMessage;
 import com.lgi.appstorebundle.service.BundleService;
 import com.lgi.appstorebundle.util.ConsumerFactory;
+import com.lgi.appstorebundle.util.EncryptionHelper;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.DeliverCallback;
 import org.slf4j.Logger;
@@ -61,6 +62,9 @@ public class RabbitMQConsumersConfiguration {
     @Autowired
     private ManagedRabbitMQ managedRabbitMQ;
 
+    @Autowired
+    private EncryptionHelper encryptionHelper;
+
     @PostConstruct
     public void setUpConsumers() throws IOException {
         List<RabbitMQConsumer<RabbitMQConfiguration>> rabbitMQConsumers = List.of(
@@ -95,7 +99,8 @@ public class RabbitMQConsumersConfiguration {
     private void processGenerationStatus(FeedbackMessage feedbackMessage, String xRequestId) {
         process(feedbackMessage, xRequestId, bundleStatus -> {
             bundleService.updateBundleStatusIfNewer(feedbackMessage.getId(), bundleStatus, feedbackMessage.getMessageTimestamp());
-            if (bundleStatus == BundleStatus.GENERATION_COMPLETED && encrypt) {
+            final boolean isEncryptionEnabled = encryptionHelper.isEncryptionEnabled(feedbackMessage);
+            if (bundleStatus == BundleStatus.GENERATION_COMPLETED && isEncryptionEnabled) {
                 bundleService.triggerBundleEncryption(feedbackMessage.getId(), xRequestId);
             }
         });

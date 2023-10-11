@@ -37,4 +37,6 @@ public interface BundleDao {
 
     boolean updateBundleStatusIfNewer(UUID id, BundleStatus status, DateTime messageTimestamp);
 
+    Optional<Boolean> isEncryptionEnabled(UUID id);
+
 }

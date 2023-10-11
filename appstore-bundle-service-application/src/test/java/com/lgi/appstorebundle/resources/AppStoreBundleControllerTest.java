@@ -73,8 +73,8 @@ class AppStoreBundleControllerTest {
 
     private static final ApplicationMetadataService ASMS_SERVICE = mock(ApplicationMetadataService.class);
     private static final BundleService BUNDLE_SERVICE = mock(BundleService.class);
-    private static final AppStoreBundleController RESOURCE_ENCRYPTION_ENABLED = new AppStoreBundleController(RETRY_AFTER_IN_SECONDS, ASMS_SERVICE, BUNDLE_SERVICE, new EncryptionHelper(ENCRYPTION_ENABLED));
-    private static final AppStoreBundleController RESOURCE_ENCRYPTION_DISABLED = new AppStoreBundleController(RETRY_AFTER_IN_SECONDS, ASMS_SERVICE, BUNDLE_SERVICE, new EncryptionHelper(ENCRYPTION_DISABLED));
+    private static final AppStoreBundleController RESOURCE_ENCRYPTION_ENABLED = new AppStoreBundleController(RETRY_AFTER_IN_SECONDS, ASMS_SERVICE, BUNDLE_SERVICE, new EncryptionHelper(ENCRYPTION_ENABLED, BUNDLE_SERVICE));
+    private static final AppStoreBundleController RESOURCE_ENCRYPTION_DISABLED = new AppStoreBundleController(RETRY_AFTER_IN_SECONDS, ASMS_SERVICE, BUNDLE_SERVICE, new EncryptionHelper(ENCRYPTION_DISABLED, BUNDLE_SERVICE));
     private static final HeaderForMaintainer APPLICATION_HEADER_FOR_MAINTAINER_ENCRYPTION_ENABLED = HeaderForMaintainer.create(APP_ID, APP_NAME, APP_VER, URL, ENCRYPTION_ENABLED, OCI_IMAGE_URL);
     private static final HeaderForMaintainer APPLICATION_HEADER_FOR_MAINTAINER_ENCRYPTION_DISABLED = HeaderForMaintainer.create(APP_ID, APP_NAME, APP_VER, URL, ENCRYPTION_DISABLED, OCI_IMAGE_URL);
     private static final Header applicationHeader = Header.create(APP_ID, APP_NAME, APP_VER, URL);
